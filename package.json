@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "tsc & node ./build",
+    "start": "node ./build",
     "dev": "tsc -w & nodemon -r dotenv/config ./build"
   },
   "dependencies": {
