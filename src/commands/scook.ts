@@ -8,16 +8,19 @@ function parseStringTime(stringTime: string) {
   return stringTime.split(":").reduceRight(calcTime, 0);
 }
 
-function filterMessageAfterCook(message: Message) {
-  if (message.author.bot && message.embeds.length > 0) {
+const filterMessageAfterCook = args => (message: Message) => {
+  if (args.length > 0 && message.author.bot && message.embeds.length > 0) {
     let embed: MessageEmbed | undefined = message.embeds[0];
     if (embed && embed.fields.length > 0) {
       const field: EmbedField | undefined = embed.fields[0];
-      return field && field.value.indexOf("Waktu") >= 0;
+      if (field && field.value) {
+        const value = field.value.toLowerCase();
+        return value.indexOf("waktu") >= 0 && value.indexOf(args[0]) >= 0;
+      }
     }
   }
   return false;
-}
+};
 
 function getTimeFromMEssage(content: string) {
   const result = content.match(/(([0-9]+):([0-9]+):([0-9]+))/gm);
@@ -25,10 +28,10 @@ function getTimeFromMEssage(content: string) {
   return result.length > 0 ? result[0] : "";
 }
 
-function handle(message: Message) {
+function handle(message: Message, args: string[]) {
   if (message.author.bot) return;
   message.channel
-    .awaitMessages(filterMessageAfterCook, {
+    .awaitMessages(filterMessageAfterCook(args), {
       max: 2,
       time: 2000
     })

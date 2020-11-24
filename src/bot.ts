@@ -27,11 +27,17 @@ export function startBot() {
       //   }
       // }
 
-      if (message.content.toLocaleLowerCase().startsWith("scook")) {
-        scook(message);
-      }
-      if (message.content.toLocaleLowerCase().startsWith("swork")) {
-        swork(message);
+      const [command, ...args] = message.content.toLocaleLowerCase().split(" ");
+
+      switch (command) {
+        case "scook":
+          scook(message, args);
+          break;
+        case "swork":
+          swork(message);
+          break;
+        default:
+          break;
       }
     }
   });
