@@ -20,10 +20,10 @@ function handle(message: Message) {
       const col = collected.first();
       if (col) {
         message.reply(
-          `kamu sudah bekerja, nanti akan di ingatkan setelah 5 menit`
+          `kamu sudah jualan, nanti akan diingatkan jualan lagi setelah 5 menit`
         );
         setTimeout(() => {
-          message.reply("waktunya bekerja");
+          message.reply("waktunya jualan");
         }, 5 * 60 * 1000 + 1000);
       }
     });

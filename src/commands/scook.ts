@@ -28,6 +28,12 @@ function getTimeFromMEssage(content: string) {
   return result.length > 0 ? result[0] : "";
 }
 
+function getMenuName(text: string) {
+  const result = text.match(/\*([a-zA-Z\s]+)\s/);
+
+  return result?.[1];
+}
+
 function handle(message: Message, args: string[]) {
   if (message.author.bot) return;
   message.channel
@@ -38,16 +44,20 @@ function handle(message: Message, args: string[]) {
     .then((collected: Collection<string, Message>) => {
       const col = collected.first();
       if (col) {
-        const text = getTimeFromMEssage(col.embeds[0].fields[0].value);
+        const value = col?.embeds?.[0].fields?.[0]?.value;
+        const text = getTimeFromMEssage(value);
+        const cookName = getMenuName(value);
         const time = parseStringTime(text);
 
         if (time > 0) {
           setTimeout(() => {
-            message.reply("waktunya take masakan");
+            message.reply(
+              `masakan **${cookName}** sudah matang. Segera angkat sebelum gosong.`
+            );
           }, time * 1000 + 1000);
 
           message.reply(
-            `Sepertinya kamu sedang masak, nanti akan di ingatkan setelah ${time} detik`
+            `Sepertinya kamu sedang masak **${cookName}**, nanti akan di ingatkan setelah ${time} detik`
           );
         }
       }
