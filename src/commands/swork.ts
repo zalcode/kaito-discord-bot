@@ -19,8 +19,8 @@ function handle(message: Message) {
     .then((collected: Collection<string, Message>) => {
       const col = collected.first();
       if (col) {
-        message.reply(
-          `kamu sudah jualan, nanti akan diingatkan jualan lagi setelah 5 menit`
+        message.channel.send(
+          `**${message?.author?.username}** sudah jualan, nanti akan diingatkan jualan lagi setelah 5 menit`
         );
         setTimeout(() => {
           message.reply("waktunya jualan");

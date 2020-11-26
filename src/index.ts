@@ -13,7 +13,8 @@ app.get("/", (req, res) => {
   res.json({ status: "OK", date: new Date() });
 });
 
+startBot();
+
 app.listen(port, () => {
-  startBot();
   console.log(`server is listening on ${port}`);
 });

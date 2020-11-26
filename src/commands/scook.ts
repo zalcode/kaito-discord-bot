@@ -52,12 +52,12 @@ function handle(message: Message, args: string[]) {
         if (time > 0) {
           setTimeout(() => {
             message.reply(
-              `masakan **${cookName}** sudah matang. Segera angkat sebelum gosong.`
+              `**${cookName}** sudah matang. Segera angkat sebelum gosong.`
             );
           }, time * 1000 + 1000);
 
-          message.reply(
-            `Sepertinya kamu sedang masak **${cookName}**, nanti akan di ingatkan setelah ${time} detik`
+          message.channel.send(
+            `**${message?.author?.username}**, sepertinya kamu masak **${cookName}**, nanti akan diingatkan setelah ${time} detik`
           );
         }
       }
