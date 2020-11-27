@@ -3,7 +3,7 @@ import { isSuccessCook } from "../helpers/cook";
 import { client, getObject, setObject } from "../redis";
 import { sendMessage } from "../services/api";
 
-type Tracker = {
+export type Tracker = {
   currentIndex: number;
   counter: number;
 };
@@ -28,16 +28,16 @@ export default async function autoCook(message: Message) {
   const cookCommands = await getObject<CookCommand[]>("commands");
   const tracker = await getObject<Tracker>("tracker");
 
-  sendMessage("stake 1", message.channel.id);
+  await sendMessage("stake 1", message.channel.id);
 
   const { currentIndex = 0, counter = 0 } = tracker || {};
   const { menu, materials, maxCook } = cookCommands?.[currentIndex];
 
   if (currentIndex === cookCommands.length - 1 && counter === maxCook) {
-    sendMessage("swork", message.channel.id);
+    await sendMessage("swork", message.channel.id);
   }
 
-  sendMessage(`scook ${menu}`, message.channel.id);
+  await sendMessage(`scook ${menu}`, message.channel.id);
 
   const cookTime = await isSuccessCook(message, menu);
 
@@ -49,8 +49,8 @@ export default async function autoCook(message: Message) {
 
   for (let index = 0; index < materials.length; index++) {
     const material = materials[index];
-    sendMessage(`sbuy ${material.name} ${material.amount}`, message.channel.id);
-    sendMessage("y", message.channel.id);
+    await sendMessage(`sbuy ${material.name} ${material.amount}`, message.channel.id);
+    await sendMessage("y", message.channel.id);
   }
 
   if (counter >= maxCook) {
@@ -63,5 +63,5 @@ export default async function autoCook(message: Message) {
     trackerExecution = { currentIndex, counter: counter + 1 };
   }
 
-  setObject("tracker", trackerExecution);
+  await setObject("tracker", trackerExecution);
 }

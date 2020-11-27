@@ -26,7 +26,10 @@ function filterMessageAfterCook(cookName) {
         const field: EmbedField | undefined = embed.fields[0];
         if (field && field.value) {
           const value = field.value.toLowerCase();
-          return value.indexOf("waktu") >= 0 && value.indexOf(cookName) >= 0;
+          return (
+            value.indexOf("waktu") >= 0 &&
+            value.indexOf(cookName.toLowerCase()) >= 0
+          );
         }
       }
     }
