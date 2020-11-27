@@ -34,7 +34,7 @@ export function startBot() {
           scook(message, args);
           break;
         case "swork":
-          swork(message);
+          // swork(message);
           break;
         default:
           break;
