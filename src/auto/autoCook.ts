@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
-import { getObject, setObject } from "../redis";
+import { isSuccessCook } from "../helpers/cook";
+import { client, getObject, setObject } from "../redis";
 import { sendMessage } from "../services/api";
 
 type Tracker = {
@@ -19,6 +20,10 @@ type CookCommand = {
 };
 
 export default async function autoCook(message: Message) {
+  const isEnable = await client.get("autocook");
+
+  if (isEnable !== "true") return;
+
   let trackerExecution = {};
   const cookCommands = await getObject<CookCommand[]>("commands");
   const tracker = await getObject<Tracker>("tracker");
@@ -33,6 +38,14 @@ export default async function autoCook(message: Message) {
   }
 
   sendMessage(`scook ${menu}`, message.channel.id);
+
+  const cookTime = await isSuccessCook(message, menu);
+
+  if (cookTime === undefined) return;
+
+  setTimeout(() => {
+    autoCook(message);
+  }, cookTime.time * 1000 + 1000);
 
   for (let index = 0; index < materials.length; index++) {
     const material = materials[index];

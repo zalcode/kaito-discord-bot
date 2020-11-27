@@ -1,6 +1,8 @@
 import Discord from "discord.js";
 import scook from "./commands/scook";
 import swork from "./commands/swork";
+import autocook from "./commands/kaito/autocook";
+import status from "./commands/kaito/status";
 
 const channelId = process.env.CHANNEL_ID;
 const botToken = process.env.BOT_TOKEN;
@@ -18,23 +20,25 @@ export function startBot() {
 
   client.on("message", function(message) {
     if (channelId && message.channel.id === channelId) {
-      // TODO: FOR DEBUGGING
-      // if (message.author.bot) {
-      //   const embed = message.embeds[0];
-      //   if (embed) {
-      //     console.log(embed);
-      //     console.log(embed.title.indexOf("Dapur"));
-      //   }
-      // }
-
-      const [command, ...args] = message.content.toLocaleLowerCase().split(" ");
+      const [
+        command,
+        action,
+        ...args
+      ] = message.content.toLocaleLowerCase().split(" ");
 
       switch (command) {
-        case "scook":
-          scook(message, args);
-          break;
-        case "swork":
-          // swork(message);
+        case "kaito":
+          switch (action) {
+            case "change":
+              // TODO
+              break;
+            case "autocook":
+              autocook(message, args?.[0]);
+              break;
+            case "status":
+              status(message);
+              break;
+          }
           break;
         default:
           break;
