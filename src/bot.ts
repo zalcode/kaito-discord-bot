@@ -40,10 +40,10 @@ export function startBot() {
               // TODO
               break;
             case "autocook":
-              autocook(message, args?.[0]);
+              await autocook(message, args?.[0]);
               break;
             case "status":
-              status(message);
+              await status(message);
               break;
           }
           break;
