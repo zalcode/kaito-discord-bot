@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { client, getObject } from "../../redis";
+import { getString, getObject } from "../../redis";
 
 export default async function handle(message: Message) {
   const [stop, commands, tracker] = await Promise.all([
-    client.get("autocook"),
-    client.get("commands"),
-    client.get("tracker")
+    getString("autocook"),
+    getString("commands"),
+    getString("tracker")
   ]);
 
   message.channel.send(

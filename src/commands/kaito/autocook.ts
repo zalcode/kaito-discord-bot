@@ -1,16 +1,16 @@
 import { Message } from "discord.js";
-import { client, setObject, getObject } from "../../redis";
+import { setString, setObject, getObject } from "../../redis";
 import autoCook, { Tracker } from "../../auto/autoCook";
 
 export default async function handle(message: Message, action) {
   switch (action) {
     case "start":
-      await client.set("autocook", "true");
+      await setString("autocook", "true");
       message.channel.send("autocook started");
       autoCook(message);
       break;
     case "stop":
-      await client.set("autocook", "false");
+      await setString("autocook", "false");
       message.channel.send("autocook stoped");
       break;
     case "reset":
