@@ -1,8 +1,7 @@
 import Discord from "discord.js";
-import scook from "./commands/scook";
-import swork from "./commands/swork";
 import autocook from "./commands/kaito/autocook";
 import status from "./commands/kaito/status";
+import { getString } from "./redis";
 
 const channelId = process.env.CHANNEL_ID;
 const botToken = process.env.BOT_TOKEN;
@@ -18,13 +17,21 @@ export function startBot() {
     console.log(`Logged in as ${client.user.tag}!`);
   });
 
-  client.on("message", function(message) {
+  client.on("message", async function(message) {
     if (channelId && message.channel.id === channelId) {
       const [
         command,
         action,
         ...args
       ] = message.content.toLocaleLowerCase().split(" ");
+
+      try {
+        const username = await getString("username");
+        if (message.author.username !== username) return;
+      } catch (error) {
+        console.log(error);
+        return;
+      }
 
       switch (command) {
         case "kaito":
