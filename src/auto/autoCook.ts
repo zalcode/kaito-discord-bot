@@ -89,7 +89,7 @@ export default async function autoCook(message: Message) {
     kitchenStatus.remainingTime = cookTime.time;
     tracker.counter++;
 
-    if (tracker.counter < menu.count) {
+    if (tracker.counter > menu.count) {
       tracker.index++;
       tracker.counter = 0;
     }

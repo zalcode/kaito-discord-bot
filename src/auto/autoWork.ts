@@ -1,8 +1,13 @@
 import { Message } from "discord.js";
 import { getContentTime } from "../helpers/cook";
+import { getString } from "../redis";
 import { sendMessage } from "../services/api";
 
 export default async function autoWork(message: Message) {
+  const isEnable = await getString("autowork");
+
+  if (isEnable !== "true") return;
+
   await sendMessage("swork", message.channel.id);
 
   const collections = await message.channel.awaitMessages(filterPenjualan, {
