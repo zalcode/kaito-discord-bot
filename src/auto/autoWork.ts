@@ -38,7 +38,7 @@ function filterPenjualan(message: Message) {
 
   return (
     message.content.indexOf("Cooldown") > -1 ||
-    message.embeds?.[0].fields?.[0].value
+    message.embeds?.[0].fields?.[0]?.value
       ?.toLowerCase?.()
       ?.indexOf("menu terjual") > -1
   );
