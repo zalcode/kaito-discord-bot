@@ -45,7 +45,7 @@ export default async function autoCook(message: Message) {
     return;
   }
 
-  if (cookActions.length > tracker.index + 1) {
+  if (cookActions.length <= tracker.index) {
     tracker.index = 0;
   }
 
