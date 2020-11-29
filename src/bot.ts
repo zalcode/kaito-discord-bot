@@ -1,5 +1,6 @@
 import Discord from "discord.js";
 import autocook from "./commands/kaito/autocook";
+import autowork from "./commands/kaito/autowork";
 import status from "./commands/kaito/status";
 import { getString } from "./redis";
 
@@ -41,6 +42,9 @@ export function startBot() {
               break;
             case "autocook":
               await autocook(message, args?.[0]);
+              break;
+            case "autowork":
+              await autowork(message, args?.[0]);
               break;
             case "status":
               await status(message);
