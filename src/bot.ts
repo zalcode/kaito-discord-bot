@@ -3,6 +3,7 @@ import autocook from "./commands/kaito/autocook";
 import autowork from "./commands/kaito/autowork";
 import status from "./commands/kaito/status";
 import { getString } from "./redis";
+import { sendMessage } from "./services/api";
 
 const channelId = process.env.CHANNEL_ID;
 const botToken = process.env.BOT_TOKEN;
@@ -14,8 +15,20 @@ export function startBot() {
     throw Error("TOKEN EMPTY");
   }
 
-  client.on("ready", () => {
+  client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    const [isAutoCook, isAutoWork] = await Promise.all([
+      getString("autocook"),
+      getString("autowork")
+    ]);
+
+    if (isAutoCook === "true") {
+      await sendMessage("kaito autocook start", channelId);
+    }
+
+    if (isAutoWork === "true") {
+      await sendMessage("kaito autowork start", channelId);
+    }
   });
 
   client.on("message", async function(message) {
@@ -23,6 +36,7 @@ export function startBot() {
       const [
         command,
         action,
+        scondAction,
         ...args
       ] = message.content.toLocaleLowerCase().split(" ");
 
@@ -41,10 +55,10 @@ export function startBot() {
               // TODO
               break;
             case "autocook":
-              await autocook(message, args?.[0]);
+              await autocook(message, scondAction, args);
               break;
             case "autowork":
-              await autowork(message, args?.[0]);
+              await autowork(message, scondAction);
               break;
             case "status":
               await status(message);

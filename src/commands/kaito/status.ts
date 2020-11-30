@@ -4,11 +4,15 @@ import { getString, getObject } from "../../redis";
 export default async function handle(message: Message) {
   const [stop, commands, tracker] = await Promise.all([
     getString("autocook"),
-    getString("commands"),
-    getString("tracker")
+    getString("cookActions"),
+    getString("cookTracker")
   ]);
 
   message.channel.send(
-    `Auto Cook: ${stop}\n\nCommadns: ${commands}\n\nTracker: ${tracker}`
+    `
+    **Kaito Status**
+    Auto Cook\t\t  : ${stop}
+    Cooking list\t\t: ${commands}
+    Cook Tracker\t : ${tracker}`
   );
 }

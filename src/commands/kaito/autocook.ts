@@ -20,10 +20,12 @@ export default async function handle(
       message.channel.send("autocook stoped");
       break;
     case "add":
-      if (args.length > 2) await addAction(message, args);
-      return;
+      console.log("Add action: ", args);
+      if (args.length >= 2) await addAction(message, args);
+      break;
     case "change":
-      if (args.length > 2) await changeAction(message, args);
+      console.log("Change action: ", args);
+      if (args.length >= 2) await changeAction(message, args);
       break;
     case "reset":
       const tracker: Tracker = {
@@ -61,24 +63,20 @@ async function changeAction(message: Message, args) {
 }
 
 async function addAction(message: Message, args) {
-  const [id, count] = args;
-  const [cookActions, recipes] = await Promise.all([
+  const [id, count]: number[] = args.map(Number);
+  const [cookActions = [], recipes] = await Promise.all([
     getObject<CookAction[]>("cookActions"),
     getObject<Recipe[]>("recipes")
   ]);
 
-  if (recipes.find(v => v.id.toString() === id) === undefined) {
+  if (recipes.find(v => v.id == id) === undefined) {
     message.channel.send(`ID ${id} is not available in recipes`);
     return;
   }
 
-  const newActions = cookActions
-    .filter(val => val.id.toString() !== id)
-    .push({
-      id,
-      count
-    });
+  const filteredAction = cookActions.filter(val => val.id != id);
+  const newAction = [...filteredAction, { id, count }];
 
-  await setObject("cookActions", newActions);
-  message.channel.send("Current Cook Actions: " + JSON.stringify(newActions));
+  await setObject("cookActions", newAction);
+  message.channel.send("Current Cook Actions: " + JSON.stringify(newAction));
 }

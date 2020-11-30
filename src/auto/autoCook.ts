@@ -60,7 +60,7 @@ export default async function autoCook(message: Message) {
     }, kitchenStatus.remainingTime * 1000 + 1000);
   }
 
-  if (kitchenStatus.canTake) {
+  if (kitchenStatus.canCook == false && kitchenStatus.canTake) {
     console.log("Send stake message");
 
     await sendMessage("stake 1", message.channel.id);
@@ -76,13 +76,17 @@ export default async function autoCook(message: Message) {
 
   if (menu.count > 0) {
     await sendMessage(`scook ${recipe.name}`, message.channel.id);
-
     const cookTime = await isSuccessCook(message, recipe.name);
+
+    console.log("Send scook message : ", recipe.name);
 
     if (cookTime === undefined) {
       console.log("Failed scook ", recipe.name);
+      console.log("Kitchen Status ", kitchenStatus);
       return;
     }
+
+    console.log("Cooking time: ", cookTime?.time);
 
     await buyMaterials(message, recipe.materials);
 
@@ -108,10 +112,11 @@ function checkKitchen(message: Message): Promise<KitchenStatus> {
   // Check kitchen
   return new Promise(async (resolve, reject) => {
     await sendMessage("skit", message.channel.id);
+
     message.channel
       .awaitMessages(filterMessageFromKitchen(), {
         max: 2,
-        time: 2000
+        time: 2500
       })
       .then(collections => {
         const reaction = collections.first();

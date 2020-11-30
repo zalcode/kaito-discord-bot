@@ -21,6 +21,7 @@ export default async function autoWork(message: Message) {
     if (msg.content && msg.content.indexOf("Cooldown") > -1) {
       const time = getContentTime(msg.content);
       if (time > 0) {
+        console.log("autowork will start after: ", time);
         setTimeout(() => {
           autoWork(message);
         }, time * 1000 + 1000);
@@ -30,6 +31,9 @@ export default async function autoWork(message: Message) {
         autoWork(message);
       }, 5 * 60 * 1000 + 1000);
     }
+  } else {
+    console.log("await message is not found");
+    console.log(collections);
   }
 }
 
@@ -38,8 +42,7 @@ function filterPenjualan(message: Message) {
 
   return (
     message.content.indexOf("Cooldown") > -1 ||
-    message.embeds?.[0].fields?.[0]?.value
-      ?.toLowerCase?.()
-      ?.indexOf("menu terjual") > -1
+    message.embeds?.[0]?.description?.toLowerCase?.()?.indexOf("menu terjual") >
+      -1
   );
 }
