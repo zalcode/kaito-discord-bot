@@ -65,7 +65,7 @@ export function isSuccessCook(
   return message.channel
     .awaitMessages(filterMessageAfterCook(cookName), {
       max: 2,
-      time: 2000
+      time: 2500
     })
     .then(async (collected: Collection<string, Message>) => {
       const col = collected.first();

@@ -60,7 +60,7 @@ export default async function autoCook(message: Message) {
     }, kitchenStatus.remainingTime * 1000 + 1000);
   }
 
-  if (kitchenStatus.canCook == false && kitchenStatus.canTake) {
+  if (kitchenStatus.canCook === false && kitchenStatus.canTake) {
     console.log("Send stake message");
 
     await sendMessage("stake 1", message.channel.id);
