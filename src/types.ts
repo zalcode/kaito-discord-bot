@@ -23,6 +23,7 @@ export type CookAction = {
 };
 
 export type KitchenStatus = {
+  number: number;
   canCook: boolean;
   canTake: boolean;
   remainingTime: number;

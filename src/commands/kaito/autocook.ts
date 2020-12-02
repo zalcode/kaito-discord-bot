@@ -28,11 +28,11 @@ export default async function handle(
       if (args.length >= 2) await changeAction(message, args);
       break;
     case "reset":
-      const tracker: Tracker = {
-        index: 0,
-        counter: 0
+      const tracker: CookAction = {
+        id: 0,
+        count: 0
       };
-      await setObject("tracker", tracker);
+      await setObject("cookTracker", tracker);
       message.channel.send("autocook reseted " + JSON.stringify(tracker));
       break;
     default:

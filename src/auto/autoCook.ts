@@ -45,17 +45,43 @@ export default async function autoCook(message: Message) {
     return;
   }
 
-  if (cookActions.length <= tracker.index) {
-    tracker.index = 0;
-  }
-
   // Take before cook
   const kitchenStatus = await checkKitchen(message);
 
+  for (let index = 0; index < kitchenStatus.length; index++) {
+    if (cookActions.length <= tracker.index) {
+      tracker.index = 0;
+    }
+
+    const ks = kitchenStatus[index];
+    const menu = cookActions[tracker.index];
+    const recipe = recipes.find(r => r.id === menu.id);
+
+    await doCooking(message, ks, tracker, menu, recipe);
+  }
+}
+
+let timeOutValue;
+
+const timeOut = (callback, time) => {
+  if (timeOutValue === undefined)
+    timeOutValue = setTimeout(() => {
+      timeOutValue = undefined;
+      callback();
+    }, time);
+};
+
+async function doCooking(
+  message: Message,
+  kitchenStatus: KitchenStatus,
+  tracker,
+  menu,
+  recipe
+) {
   if (kitchenStatus.remainingTime > 0) {
     console.log("Kitchen is in used ", kitchenStatus);
 
-    return setTimeout(() => {
+    return timeOut(() => {
       autoCook(message);
     }, kitchenStatus.remainingTime * 1000 + 1000);
   }
@@ -63,11 +89,8 @@ export default async function autoCook(message: Message) {
   if (kitchenStatus.canCook === false && kitchenStatus.canTake) {
     console.log("Send stake message");
 
-    await sendMessage("stake 1", message.channel.id);
+    await sendMessage(`stake ${kitchenStatus.number}`, message.channel.id);
   }
-
-  const menu = cookActions[tracker.index];
-  const recipe = recipes.find(r => r.id === menu.id);
 
   if (recipe === undefined) {
     message.reply(`Recipe for menu ID ${menu.id} is not found in database`);
@@ -88,6 +111,10 @@ export default async function autoCook(message: Message) {
 
     console.log("Cooking time: ", cookTime?.time);
 
+    setTimeout(async () => {
+      await sendMessage(`stake ${kitchenStatus.number}`, message.channel.id);
+    }, cookTime.time * 1000 + 1000);
+
     await buyMaterials(message, recipe.materials);
 
     kitchenStatus.remainingTime = cookTime.time;
@@ -103,12 +130,12 @@ export default async function autoCook(message: Message) {
 
   await setObject("cookTracker", tracker);
 
-  setTimeout(() => {
+  timeOut(() => {
     autoCook(message);
   }, kitchenStatus.remainingTime * 1000 + 1000);
 }
 
-function checkKitchen(message: Message): Promise<KitchenStatus> {
+function checkKitchen(message: Message): Promise<KitchenStatus[]> {
   // Check kitchen
   return new Promise(async (resolve, reject) => {
     await sendMessage("skit", message.channel.id);
@@ -120,24 +147,38 @@ function checkKitchen(message: Message): Promise<KitchenStatus> {
       })
       .then(collections => {
         const reaction = collections.first();
-        const result: KitchenStatus = {
+        const defaultStatus: KitchenStatus = {
+          number: 1,
           canTake: false,
           canCook: false,
           remainingTime: 0
         };
 
-        if (reaction) {
-          const value = getFields(reaction)[0]?.value?.toLowerCase?.() || "";
+        const result: KitchenStatus[] = [];
 
-          if (value.indexOf("sisa waktu") > -1) {
-            result.remainingTime = getContentTime(value);
-          } else {
-            result.canTake = true;
-            result.canCook = value.indexOf("ready to cook") > -1;
+        if (reaction) {
+          const fields = getFields(reaction);
+          for (let index = 0; index < fields.length; index++) {
+            const field = fields[index];
+            const value = field.value.toLowerCase();
+            if (value.indexOf("sisa waktu") > -1) {
+              result[index] = {
+                ...defaultStatus,
+                number: index + 1,
+                remainingTime: getContentTime(value)
+              };
+            } else {
+              result[index] = {
+                ...defaultStatus,
+                number: index + 1,
+                canTake: true,
+                canCook: value.indexOf("ready to cook") > -1
+              };
+            }
           }
         }
 
-        resolve(result);
+        resolve(result.sort((a, b) => Number(a.canTake) - Number(b.canTake)));
       })
       .catch(reject);
   });

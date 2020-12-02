@@ -51,16 +51,16 @@ export function startBot() {
       switch (command) {
         case "kaito":
           switch (action) {
-            case "change":
-              // TODO
-              break;
             case "autocook":
+            case "ac":
               await autocook(message, scondAction, args);
               break;
             case "autowork":
+            case "aw":
               await autowork(message, scondAction);
               break;
             case "status":
+            case "st":
               await status(message);
               break;
           }
