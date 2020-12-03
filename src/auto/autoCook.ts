@@ -55,9 +55,14 @@ export default async function autoCook(message: Message) {
 
     const ks = kitchenStatus[index];
     const menu = cookActions[tracker.index];
-    const recipe = recipes.find(r => r.id === menu.id);
+    if (menu) {
+      const recipe = recipes.find(r => r.id === menu.id);
 
-    await doCooking(message, ks, tracker, menu, recipe);
+      await doCooking(message, ks, tracker, menu, recipe);
+    } else {
+      console.log("Menu not found");
+      console.log(ks, cookActions, tracker);
+    }
   }
 }
 
