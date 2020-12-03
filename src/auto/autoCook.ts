@@ -61,7 +61,9 @@ export default async function autoCook(message: Message) {
       await doCooking(message, ks, tracker, menu, recipe);
     } else {
       console.log("Menu not found");
-      console.log(ks, cookActions, tracker);
+      console.log("Kitchen Status: ", ks);
+      console.log("Cook actions: ", cookActions);
+      console.log("Tracker :", tracker);
     }
   }
 }
