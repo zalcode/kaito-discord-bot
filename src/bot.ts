@@ -73,3 +73,25 @@ export function startBot() {
 
   client.login(botToken);
 }
+
+let interval = setInterval(bomPokemona, 3000);
+
+async function bomPokemona() {
+  try {
+    const response = await sendMessage(
+      "p " + Math.random(),
+      "716390832034414688"
+    );
+  } catch (error) {
+    console.log(error.response?.data);
+    console.log(error.response?.headers);
+    const retry_after = error.response?.data?.retry_after;
+    if (retry_after) {
+      clearInterval(interval);
+      setTimeout(() => {
+        setInterval(bomPokemona, 3000);
+        bomPokemona();
+      }, retry_after * 1000);
+    }
+  }
+}

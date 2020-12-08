@@ -1,3 +1,6 @@
+import addSeconds from "date-fns/addSeconds";
+import isBefore from "date-fns/isBefore";
+import { Message } from "discord.js";
 import {
   CookAction,
   Recipe,
@@ -5,13 +8,12 @@ import {
   KitchenStatus,
   Material
 } from "./../types";
-import { Collection, Message } from "discord.js";
 import {
   filterMessageFromKitchen,
   getContentTime,
   isSuccessCook
 } from "../helpers/cook";
-import { setString, getString, getObject, setObject } from "../redis";
+import { getString, getObject, setObject } from "../redis";
 import { sendMessage } from "../services/api";
 import { getFields } from "../helpers/message";
 
@@ -55,27 +57,46 @@ export default async function autoCook(message: Message) {
 
     const ks = kitchenStatus[index];
     const menu = cookActions[tracker.index];
+
     if (menu) {
       const recipe = recipes.find(r => r.id === menu.id);
 
-      await doCooking(message, ks, tracker, menu, recipe);
+      if (recipe === undefined) {
+        message.reply(`Recipe for menu ID ${menu.id} is not found in database`);
+      } else {
+        await doCooking(message, ks, tracker, menu, recipe);
+      }
     } else {
       console.log("Menu not found");
       console.log("Kitchen Status: ", ks);
       console.log("Cook actions: ", cookActions);
-      console.log("Tracker :", tracker);
+      console.log("Tracker: ", tracker);
     }
   }
 }
 
-let timeOutValue;
+const timeOutValue = {
+  value: null,
+  time: null
+};
+
+const nextTime = time => {
+  return addSeconds(new Date(), time);
+};
 
 const timeOut = (callback, time) => {
-  if (timeOutValue === undefined)
-    timeOutValue = setTimeout(() => {
-      timeOutValue = undefined;
+  const nextDate = nextTime(time);
+  if (timeOutValue.value === null || isBefore(nextDate, timeOutValue.time)) {
+    if (timeOutValue.value !== null) {
+      clearTimeout(timeOutValue.value);
+    }
+
+    timeOutValue.time = nextDate;
+    timeOutValue.value = setTimeout(() => {
+      timeOutValue.value = null;
       callback();
     }, time);
+  }
 };
 
 async function doCooking(
@@ -97,11 +118,6 @@ async function doCooking(
     console.log("Send stake message");
 
     await sendMessage(`stake ${kitchenStatus.number}`, message.channel.id);
-  }
-
-  if (recipe === undefined) {
-    message.reply(`Recipe for menu ID ${menu.id} is not found in database`);
-    return;
   }
 
   if (menu.count > 0) {
