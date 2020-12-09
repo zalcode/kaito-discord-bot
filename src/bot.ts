@@ -7,6 +7,9 @@ import { sendMessage } from "./services/api";
 
 const channelId = process.env.CHANNEL_ID;
 const botToken = process.env.BOT_TOKEN;
+let isStartBomPokemon = true;
+let intervalPokemon = 5000;
+let intervalValue = null;
 
 export const client = new Discord.Client();
 
@@ -51,6 +54,22 @@ export function startBot() {
       switch (command) {
         case "kaito":
           switch (action) {
+            case "pst":
+              isStartBomPokemon = false;
+              break;
+            case "ps":
+              isStartBomPokemon = true;
+              break;
+            case "pi":
+              intervalPokemon = parseInt(scondAction, 10);
+              if (intervalPokemon < 1000)
+                return message.reply("dont set less than 1 second");
+
+              if (intervalValue) {
+                clearInterval(intervalValue);
+              }
+              intervalValue = setInterval(bomPokemona, intervalPokemon);
+              break;
             case "autocook":
             case "ac":
               await autocook(message, scondAction, args);
@@ -74,24 +93,23 @@ export function startBot() {
   client.login(botToken);
 }
 
-let interval = setInterval(bomPokemona, 3000);
+intervalValue = setInterval(bomPokemona, intervalPokemon);
+
+const randomText = ["Cinccino", "Boldore", "Clawitzer", "Dragonite", "Claydol"];
 
 async function bomPokemona() {
+  const randomInteger = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
   try {
-    const response = await sendMessage(
-      "p " + Math.random(),
+    if (isStartBomPokemon === false) return;
+
+    const _response = await sendMessage(
+      randomText[randomInteger(1, 5) - 1] || "i want xp",
       "716390832034414688"
     );
   } catch (error) {
     console.log(error.response?.data);
-    console.log(error.response?.headers);
-    const retry_after = error.response?.data?.retry_after;
-    if (retry_after) {
-      clearInterval(interval);
-      setTimeout(() => {
-        setInterval(bomPokemona, 3000);
-        bomPokemona();
-      }, retry_after * 1000);
-    }
   }
 }

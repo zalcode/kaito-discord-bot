@@ -6,6 +6,24 @@ const http = rateLimit(axios.create(), {
   perMilliseconds: 2000
 });
 
+http.interceptors.response.use(null, error => {
+  const retry_after = error.response?.data?.retry_after;
+  const status = error?.response?.status;
+
+  if (status === 429 && retry_after) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        http
+          .request(error.config)
+          .then(resolve)
+          .catch(reject);
+      }, parseFloat(retry_after) * 1000);
+    });
+  }
+
+  return Promise.reject(error);
+});
+
 function getEnv() {
   return {
     superProperty: process.env.SUPER_PROPERTY,

@@ -1,4 +1,4 @@
-import addSeconds from "date-fns/addSeconds";
+import addMilliseconds from "date-fns/addMilliseconds";
 import isBefore from "date-fns/isBefore";
 import { Message } from "discord.js";
 import {
@@ -80,12 +80,12 @@ const timeOutValue = {
   time: null
 };
 
-const nextTime = time => {
-  return addSeconds(new Date(), time);
+const nextTime = milisecond => {
+  return addMilliseconds(new Date(), milisecond);
 };
 
-const timeOut = (callback, time) => {
-  const nextDate = nextTime(time);
+const timeOut = (callback, milisecond) => {
+  const nextDate = nextTime(milisecond);
   if (timeOutValue.value === null || isBefore(nextDate, timeOutValue.time)) {
     if (timeOutValue.value !== null) {
       clearTimeout(timeOutValue.value);
@@ -95,7 +95,7 @@ const timeOut = (callback, time) => {
     timeOutValue.value = setTimeout(() => {
       timeOutValue.value = null;
       callback();
-    }, time);
+    }, milisecond);
   }
 };
 
