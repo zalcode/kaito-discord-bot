@@ -54,10 +54,10 @@ export function startBot() {
       switch (command) {
         case "kaito":
           switch (action) {
-            case "pst":
+            case "pstart":
               isStartBomPokemon = false;
               break;
-            case "ps":
+            case "pstop":
               isStartBomPokemon = true;
               break;
             case "pi":
@@ -76,7 +76,7 @@ export function startBot() {
               break;
             case "autowork":
             case "aw":
-              await autowork(message, scondAction);
+              await autowork(message, scondAction, args);
               break;
             case "status":
             case "st":
