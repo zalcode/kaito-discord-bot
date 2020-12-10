@@ -27,6 +27,7 @@ export default async function handle(message: Message, action, args = []) {
 
       await setString("autoworkTime", args[0]);
       message.channel.send("Autowork Time : " + args[0] + " minutes");
+      autoWork(message);
     default:
       break;
   }
