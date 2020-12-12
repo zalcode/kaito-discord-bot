@@ -1,11 +1,13 @@
 import Discord from "discord.js";
+import { hunt } from "./commands/hunt";
 import autocook from "./commands/kaito/autocook";
 import autowork from "./commands/kaito/autowork";
 import status from "./commands/kaito/status";
-import { getString } from "./redis";
+import { getString, setString } from "./redis";
 import { sendMessage } from "./services/api";
 
 const channelId = process.env.CHANNEL_ID;
+const username = process.env.USERNAME;
 const botToken = process.env.BOT_TOKEN;
 let isStartBomPokemon = true;
 let intervalPokemon = 5000;
@@ -20,22 +22,16 @@ export function startBot() {
 
   client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    const [isAutoCook, isAutoWork] = await Promise.all([
-      getString("autocook"),
-      getString("autowork")
-    ]);
+    const hunt = await getString("hunt");
+    const jail = await getString("jail");
 
-    if (isAutoCook === "true") {
-      await sendMessage("kaito autocook start", channelId);
-    }
-
-    if (isAutoWork === "true") {
-      await sendMessage("kaito autowork start", channelId);
+    if (hunt === "true" && jail !== "true") {
+      await sendMessage("kaito hunt", channelId);
     }
   });
 
   client.on("message", async function(message) {
-    if (channelId && message.channel.id === channelId) {
+    if (message.author.username === username) {
       const [
         command,
         action,
@@ -55,10 +51,12 @@ export function startBot() {
         case "kaito":
           switch (action) {
             case "pstart":
-              isStartBomPokemon = false;
+              isStartBomPokemon = true;
+              message.reply("Starting pokemon spam");
               break;
             case "pstop":
-              isStartBomPokemon = true;
+              isStartBomPokemon = false;
+              message.reply("Stoping pokemon spam");
               break;
             case "pi":
               intervalPokemon = parseInt(scondAction, 10);
@@ -82,6 +80,20 @@ export function startBot() {
             case "st":
               await status(message);
               break;
+            case "hunt":
+              switch (scondAction) {
+                case "stop":
+                  await setString("hunt", "false");
+                  message.channel.send("stoping hunt");
+                  break;
+                case "start":
+                default:
+                  await setString("hunt", "true");
+                  message.channel.send("starting hunt");
+                  await hunt(message);
+                  break;
+              }
+              break;
           }
           break;
         default:
@@ -97,11 +109,11 @@ intervalValue = setInterval(bomPokemona, intervalPokemon);
 
 const randomText = ["Cinccino", "Boldore", "Clawitzer", "Dragonite", "Claydol"];
 
-async function bomPokemona() {
-  const randomInteger = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
+const randomInteger = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
+async function bomPokemona() {
   try {
     if (isStartBomPokemon === false) return;
 
