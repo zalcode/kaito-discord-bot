@@ -7,7 +7,6 @@ import { getString, setString } from "./redis";
 import { sendMessage } from "./services/api";
 
 const channelId = process.env.CHANNEL_ID;
-const username = process.env.USERNAME;
 const botToken = process.env.BOT_TOKEN;
 let isStartBomPokemon = true;
 let intervalPokemon = 5000;
@@ -31,7 +30,7 @@ export function startBot() {
   });
 
   client.on("message", async function(message) {
-    if (message.author.username === username) {
+    if (channelId && message.channel.id === channelId) {
       const [
         command,
         action,
