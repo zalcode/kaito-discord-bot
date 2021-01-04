@@ -3,6 +3,7 @@ import { getFields } from "./message";
 
 type CookTime = {
   time: number;
+  cookName: string;
 };
 
 export function calcTime(
@@ -22,6 +23,12 @@ export function getContentTime(content: string) {
   const result = content.match(/(([0-9]+):([0-9]+):([0-9]+))/gm);
 
   return result.length > 0 ? parseStringTime(result[0]) : 0;
+}
+
+export function getMenuName(text: string) {
+  const result = text.match(/\*([a-zA-Z\s]+)\s/);
+
+  return result?.[1];
 }
 
 export function filterMessageFromKitchen() {
@@ -72,9 +79,11 @@ export function isSuccessCook(
       if (col) {
         const value = col?.embeds?.[0].fields?.[0]?.value;
         const time = getContentTime(value);
+        const cookName = getMenuName(value);
 
         return {
-          time
+          time,
+          cookName
         };
       }
 
