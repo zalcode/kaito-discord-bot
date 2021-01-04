@@ -3,11 +3,15 @@ import autoCook from "../auto/autoCook";
 import { isSuccessCook } from "../helpers/cook";
 
 async function handle(message: Message, args: string[]) {
-  if (message.author.bot || args.length === 0) return;
+  if (message.author.bot) return;
 
   const cook = await isSuccessCook(message, args[0]);
 
-  if (cook === undefined) return;
+  if (cook === undefined) {
+    console.log("Cook not found");
+    console.log(args, cook, message.embeds?.[0]?.fields);
+    return;
+  }
 
   if (cook.time > 0) {
     setTimeout(() => {

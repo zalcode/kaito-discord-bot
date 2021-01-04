@@ -52,7 +52,7 @@ export function startBot() {
 
       switch (command) {
         case "scook":
-          scook(message, args);
+          scook(message, [action, scondAction, ...args]);
           break;
         case "swork":
           swork(message);

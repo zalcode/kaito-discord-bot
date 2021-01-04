@@ -68,7 +68,7 @@ export default async function autoWork(message: Message) {
       }, resolveMinute * 60 * 1000 + 1000);
     }
   } else {
-    console.log("await message is not found");
+    console.log("auto work message not found");
     console.log(collections);
   }
 }

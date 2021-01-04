@@ -46,7 +46,7 @@ export function filterMessageFromKitchen() {
   };
 }
 
-export function filterMessageAfterCook(cookName) {
+export function filterMessageAfterCook(cookName = "") {
   return function(message: Message) {
     if (message.author.bot && message.embeds.length > 0) {
       let embed: MessageEmbed | undefined = message.embeds[0];
